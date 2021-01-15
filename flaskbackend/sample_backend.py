@@ -74,9 +74,7 @@ def get_users():
       return users
    elif request.method == 'POST':
       userToAdd = request.get_json()
-      print(userToAdd)
       userToAdd["id"] = generateID()
-      print(userToAdd)
       users['users_list'].append(userToAdd)
       resp = jsonify(userToAdd),201
       # resp = jsonify(success=True)

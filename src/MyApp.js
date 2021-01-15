@@ -15,17 +15,6 @@ function MyApp() {
       });
    }, []);
 
-   function removeOneCharacter(index) {
-      const updated = characters.filter((character, i) => {
-         return i !== index
-      });
-      setCharacters(updated);
-   }
-   
-   function updateList(person) {
-      setCharacters([...characters, person]);
-   }
-
    async function fetchAll() {
       try {
          const response = await axios.get('http://localhost:5000/users');
@@ -35,6 +24,53 @@ function MyApp() {
          console.log(error);
          return false;
       }
+   }
+
+   async function makePostCall(person) {
+      try{
+         const response = await axios.post('http://localhost:5000/users', person);
+         console.log(response.data);
+         return response;
+      }
+      
+      catch (error) {
+         console.log(error);
+         return false;
+      }
+   }
+   
+   async function makeDeleteCall(id) {
+
+      try {
+         const response = await axios.delete('http://localhost:5000/users/' + id);
+         return response;
+      }
+      catch (error) {
+         console.log(error);
+         return false;
+      }
+   }
+
+   function removeOneCharacter(id) {
+
+      makeDeleteCall(id).then( result => {
+
+         if (result.status === 204) {
+
+            const updated = characters.filter((character) => {
+               if (character)
+                  return character.id !== id
+            });
+            setCharacters(updated)
+         }
+      });
+   }
+   
+   function updateList(person) {
+      makePostCall(person).then( result => { // What if some other user posts at the same time?
+         if (result)
+            setCharacters([...characters, result.data]); // Would this include the other new post?
+      });
    }
 
    return (
