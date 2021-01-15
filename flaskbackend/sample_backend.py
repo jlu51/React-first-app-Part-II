@@ -4,6 +4,9 @@ from flask import jsonify
 
 from flask_cors import CORS
 
+import random
+import string
+
 app = Flask(__name__)
 CORS(app)
 
@@ -38,16 +41,27 @@ users = {
    ]
 }
 
-@app.route('/users/<id>')
+def generateID():
+   letters_and_digits = string.ascii_letters +  string.digits
+   result_str =  ''.join((random.choice(letters_and_digits) for i in range(6)))
+   return result_str
+
+@app.route('/users/<id>', methods=['GET', 'DELETE'])
 def get_user(id):
    if id:
       for user in users['users_list']:
          if user['id'] == id:
-            return user
-      return ({})
-   return users
+            if request.method == 'GET':
+               return user
+            elif request.method == 'DELETE':
+               users['users_list'].remove(user)
+               resp = jsonify(users['users_list']),204
+               return resp
+      resp = jsonify({"Msg": "User not found with provided ID."}), 404
+      return resp
+   return users 
 
-@app.route('/users', methods=['GET', 'POST', 'DELETE'])
+@app.route('/users', methods=['GET', 'POST'])
 def get_users():
    if request.method == 'GET':
       search_username = request.args.get('name')
@@ -60,23 +74,15 @@ def get_users():
       return users
    elif request.method == 'POST':
       userToAdd = request.get_json()
+      print(userToAdd)
+      userToAdd["id"] = generateID()
+      print(userToAdd)
       users['users_list'].append(userToAdd)
-      resp = jsonify(success=True)
+      resp = jsonify(userToAdd),201
+      # resp = jsonify(success=True)
       #resp.status_code = 200 #optionally, you can always set a response code. 
       # 200 is the default code for a normal response
       return resp
-
-   elif request.method == 'DELETE':
-      resp = jsonify(success=False)
-      userToDelete = request.get_json()
-      for user in users['users_list']:
-         if user['id'] == userToDelete['id']:
-            users['users_list'].remove(user)
-            resp = jsonify(success=True)
-      return resp
-
-
-
 
 @app.route('/')
 def hello_world():
