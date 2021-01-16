@@ -29,7 +29,7 @@ function MyApp() {
    async function makePostCall(person) {
       try{
          const response = await axios.post('http://localhost:5000/users', person);
-         console.log(response.data);
+         // console.log(response.data);
          return response;
       }
       
@@ -68,7 +68,7 @@ function MyApp() {
    
    function updateList(person) {
       makePostCall(person).then( result => { // What if some other user posts at the same time?
-         if (result)
+         if (result.status === 201)
             setCharacters([...characters, result.data]); // Would this include the other new post?
       });
    }

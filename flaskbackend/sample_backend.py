@@ -76,7 +76,7 @@ def get_users():
       userToAdd = request.get_json()
       userToAdd["id"] = generateID()
       users['users_list'].append(userToAdd)
-      resp = jsonify(userToAdd),201
+      resp = jsonify(userToAdd),201    # Step 6.1: Changed 201 HTTP code to 204 HTTP code
       # resp = jsonify(success=True)
       #resp.status_code = 200 #optionally, you can always set a response code. 
       # 200 is the default code for a normal response
